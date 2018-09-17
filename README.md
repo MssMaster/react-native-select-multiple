@@ -9,7 +9,7 @@
 ## Install
 
 ```sh
-npm install react-native-select-multiple
+npm install @MssMaster/react-native-select-multiple
 ```
 
 ## Usage
