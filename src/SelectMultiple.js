@@ -8,7 +8,7 @@ import { mergeStyles } from './style'
 
 const itemType = PropTypes.oneOfType([
   PropTypes.string,
-  PropTypes.shape({ label: PropTypes.any, value: PropTypes.any })
+  PropTypes.shape({ value: PropTypes.any, code: PropTypes.any })
 ])
 
 const styleType = PropTypes.oneOfType([
@@ -59,7 +59,7 @@ export default class SelectMultiple extends Component {
     const rows = this.getRowData(props)
 
     const dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1.value !== r2.value || r1.selected !== r2.selected
+      rowHasChanged: (r1, r2) => r1.code !== r2.code || r1.selected !== r2.selected
     }).cloneWithRows(rows)
 
     this.state = { dataSource }
@@ -76,34 +76,32 @@ export default class SelectMultiple extends Component {
     selectedItems = (selectedItems || []).map(this.toLabelValueObject)
 
     items.forEach((item) => {
-      item.selected = selectedItems.some((i) => i.value === item.value)
+      item.selected = selectedItems.some((i) => i.label === item.label)
     })
-
     return items
   }
 
   onRowPress (row) {
-    const { label, value } = row
+    const { value, code,label } = row
     let { selectedItems } = this.props
 
     selectedItems = (selectedItems || []).map(this.toLabelValueObject)
 
-    const index = selectedItems.findIndex((selectedItem) => selectedItem.value === value)
+    const index = selectedItems.findIndex((selectedItem) => selectedItem.label === label)
 
     if (index > -1) {
-      selectedItems = selectedItems.filter((selectedItem) => selectedItem.value !== value)
+      selectedItems = selectedItems.filter((selectedItem) => selectedItem.label !== label)
     } else {
-      selectedItems = selectedItems.concat({ label, value })
+      selectedItems = selectedItems.concat({ label })
     }
-
-    this.props.onSelectionsChange(selectedItems, { label, value })
+    this.props.onSelectionsChange(selectedItems, { value, code })
   }
 
   toLabelValueObject (obj) {
     if (Object.prototype.toString.call(obj) === '[object String]') {
-      return { label: obj, value: obj }
+      return {value: obj, code: obj }
     } else {
-      return { label: obj.label, value: obj.value }
+      return {label: obj.label, value: obj.value, code: obj.code }
     }
   }
 
@@ -148,7 +146,6 @@ export default class SelectMultiple extends Component {
       checkboxStyle = mergeStyles(styles.checkbox, checkboxStyle)
       labelStyle = mergeStyles(styles.label, labelStyle)
     }
-
     return (
       <TouchableWithoutFeedback onPress={() => this.onRowPress(row)}>
         <View style={rowStyle}>
